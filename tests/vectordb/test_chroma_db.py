@@ -30,7 +30,7 @@ def cleanup_db():
     try:
         shutil.rmtree("test-db")
     except OSError as e:
-        print("Error: %s - %s." % (e.filename, e.strerror))
+        print(f"Error: {e.filename} - {e.strerror}.")
 
 
 @pytest.mark.skip(reason="ChromaDB client needs to be mocked")

@@ -12,11 +12,13 @@ def generate_error_message_for_api_keys(error: ValueError) -> str:
         "REPLICATE_API_TOKEN": "REPLICATE_API_TOKEN",
     }
 
-    missing_keys = [env_mapping[key] for key in env_mapping if key in str(error)]
-    if missing_keys:
-        missing_keys_str = ", ".join(missing_keys)
-        return f"""Please set the {missing_keys_str} environment variable(s) when running the Docker container.
+    if not (
+        missing_keys := [
+            env_mapping[key] for key in env_mapping if key in str(error)
+        ]
+    ):
+        return f"Error: {str(error)}"
+    missing_keys_str = ", ".join(missing_keys)
+    return f"""Please set the {missing_keys_str} environment variable(s) when running the Docker container.
 Example: `docker run -e {missing_keys[0]}=xxx embedchain/rest-api:latest`
 """
-    else:
-        return "Error: " + str(error)

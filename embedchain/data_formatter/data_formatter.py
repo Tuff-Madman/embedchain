@@ -79,8 +79,7 @@ class DataFormatter(JSONSerializable):
         }
 
         if data_type == DataType.CUSTOM or loader is not None:
-            loader_class: type = loader
-            if loader_class:
+            if loader_class := loader:
                 return loader_class
         elif data_type in loaders:
             loader_class: type = self._lazy_load(loaders[data_type])

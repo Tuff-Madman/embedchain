@@ -38,10 +38,9 @@ class ChunkerConfig(BaseConfig):
     def load_func(self, dotpath: str):
         if "." not in dotpath:
             return getattr(builtins, dotpath)
-        else:
-            module_, func = dotpath.rsplit(".", maxsplit=1)
-            m = import_module(module_)
-            return getattr(m, func)
+        module_, func = dotpath.rsplit(".", maxsplit=1)
+        m = import_module(module_)
+        return getattr(m, func)
 
 
 @register_deserializable

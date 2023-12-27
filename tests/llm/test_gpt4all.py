@@ -7,7 +7,7 @@ from embedchain.llm.gpt4all import GPT4ALLLlm
 
 @pytest.fixture
 def config():
-    config = BaseLlmConfig(
+    yield BaseLlmConfig(
         temperature=0.7,
         max_tokens=50,
         top_p=0.8,
@@ -15,7 +15,6 @@ def config():
         system_prompt="System prompt",
         model="orca-mini-3b-gguf2-q4_0.gguf",
     )
-    yield config
 
 
 @pytest.fixture

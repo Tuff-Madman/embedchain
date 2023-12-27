@@ -11,9 +11,7 @@ class ClipProcessor:
     @staticmethod
     def load_model():
         """Load data from a director of images."""
-        # load model and image preprocessing
-        model = SentenceTransformer(MODEL_NAME)
-        return model
+        return SentenceTransformer(MODEL_NAME)
 
     @staticmethod
     def get_image_features(image_url, model):

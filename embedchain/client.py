@@ -14,24 +14,22 @@ class Client:
         self.host = host
 
         if api_key:
-            if self.check(api_key):
-                self.api_key = api_key
-                self.save()
-            else:
+            if not self.check(api_key):
                 raise ValueError(
                     "Invalid API key provided. You can find your API key on https://app.embedchain.ai/settings/keys."
                 )
+            self.api_key = api_key
+            self.save()
+        elif "api_key" in self.config_data:
+            self.api_key = self.config_data["api_key"]
+            logging.info("API key loaded successfully!")
         else:
-            if "api_key" in self.config_data:
-                self.api_key = self.config_data["api_key"]
-                logging.info("API key loaded successfully!")
-            else:
-                raise ValueError(
-                    "You are not logged in. Please obtain an API key from https://app.embedchain.ai/settings/keys/"
-                )
+            raise ValueError(
+                "You are not logged in. Please obtain an API key from https://app.embedchain.ai/settings/keys/"
+            )
 
     @classmethod
-    def setup_dir(self):
+    def setup_dir(cls):
         """
         Loads the user id from the config file if it exists, otherwise generates a new
         one and saves it to the config file.
@@ -88,10 +86,9 @@ class Client:
         response = requests.post(validation_url, headers={"Authorization": f"Token {api_key}"})
         if response.status_code == 200:
             return True
-        else:
-            logging.warning(f"Response from API: {response.text}")
-            logging.warning("Invalid API key. Unable to validate.")
-            return False
+        logging.warning(f"Response from API: {response.text}")
+        logging.warning("Invalid API key. Unable to validate.")
+        return False
 
     def get(self):
         return self.api_key

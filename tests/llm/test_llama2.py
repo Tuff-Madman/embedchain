@@ -8,8 +8,7 @@ from embedchain.llm.llama2 import Llama2Llm
 @pytest.fixture
 def llama2_llm():
     os.environ["REPLICATE_API_TOKEN"] = "test_api_token"
-    llm = Llama2Llm()
-    return llm
+    return Llama2Llm()
 
 
 def test_init_raises_value_error_without_api_key(mocker):

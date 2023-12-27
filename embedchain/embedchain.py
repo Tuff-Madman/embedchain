@@ -295,7 +295,7 @@ class EmbedChain(JSONSerializable):
                 where = {"url": url}
 
             if self.config.id is not None:
-                where.update({"app_id": self.config.id})
+                where["app_id"] = self.config.id
 
             existing_embeddings = self.db.get(
                 where=where,
@@ -312,7 +312,7 @@ class EmbedChain(JSONSerializable):
                 # QNA_PAIRs update the answer if the question already exists.
                 where = {"question": src[0]}
                 if self.config.id is not None:
-                    where.update({"app_id": self.config.id})
+                    where["app_id"] = self.config.id
 
                 existing_embeddings = self.db.get(
                     where=where,
@@ -372,7 +372,7 @@ class EmbedChain(JSONSerializable):
             return [], [], [], 0
 
         # this means that doc content has changed.
-        if existing_doc_id and existing_doc_id != new_doc_id:
+        if existing_doc_id:
             print("Doc content has changed. Recomputing chunks and embeddings intelligently.")
             self.db.delete({"doc_id": existing_doc_id})
 
@@ -398,7 +398,7 @@ class EmbedChain(JSONSerializable):
             if not data_dict:
                 src_copy = src
                 if len(src_copy) > 50:
-                    src_copy = src[:50] + "..."
+                    src_copy = f"{src[:50]}..."
                 print(f"All data from {src_copy} already exists in the database.")
                 # Make sure to return a matching return type
                 return [], [], [], 0
@@ -497,16 +497,16 @@ class EmbedChain(JSONSerializable):
 
             db_query = ClipProcessor.get_text_features(query=input_query)
 
-        contexts = self.db.query(
+        return self.db.query(
             input_query=db_query,
             n_results=query_config.number_documents,
             where=where,
-            skip_embedding=(hasattr(config, "query_type") and config.query_type == "Images"),
+            skip_embedding=(
+                hasattr(config, "query_type") and config.query_type == "Images"
+            ),
             citations=citations,
             **kwargs,
         )
-
-        return contexts
 
     def query(
         self,
@@ -554,10 +554,7 @@ class EmbedChain(JSONSerializable):
         # Send anonymous telemetry
         self.telemetry.capture(event_name="query", properties=self._telemetry_props)
 
-        if citations:
-            return answer, contexts
-        else:
-            return answer
+        return (answer, contexts) if citations else answer
 
     def chat(
         self,
@@ -610,10 +607,7 @@ class EmbedChain(JSONSerializable):
         # Send anonymous telemetry
         self.telemetry.capture(event_name="chat", properties=self._telemetry_props)
 
-        if citations:
-            return answer, contexts
-        else:
-            return answer
+        return (answer, contexts) if citations else answer
 
     def set_collection_name(self, name: str):
         """

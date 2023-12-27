@@ -10,8 +10,9 @@ from embedchain.llm.huggingface import HuggingFaceLlm
 @pytest.fixture
 def huggingface_llm_config():
     os.environ["HUGGINGFACE_ACCESS_TOKEN"] = "test_access_token"
-    config = BaseLlmConfig(model="google/flan-t5-xxl", max_tokens=50, temperature=0.7, top_p=0.8)
-    yield config
+    yield BaseLlmConfig(
+        model="google/flan-t5-xxl", max_tokens=50, temperature=0.7, top_p=0.8
+    )
     os.environ.pop("HUGGINGFACE_ACCESS_TOKEN")
 
 

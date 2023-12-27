@@ -90,12 +90,11 @@ class OpenSearchDB(BaseVectorDB):
         :return: ids
         :type: Set[str]
         """
-        query = {}
-        if ids:
-            query["query"] = {"bool": {"must": [{"ids": {"values": ids}}]}}
-        else:
-            query["query"] = {"bool": {"must": []}}
-
+        query = {
+            "query": {"bool": {"must": [{"ids": {"values": ids}}]}}
+            if ids
+            else {"bool": {"must": []}}
+        }
         if "app_id" in where:
             app_id = where["app_id"]
             query["query"]["bool"]["must"].append({"term": {"metadata.app_id.keyword": app_id}})
@@ -220,7 +219,7 @@ class OpenSearchDB(BaseVectorDB):
             if citations:
                 source = doc.metadata["url"]
                 doc_id = doc.metadata["doc_id"]
-                contexts.append(tuple((context, source, doc_id)))
+                contexts.append((context, source, doc_id))
             else:
                 contexts.append(context)
         return contexts
@@ -245,8 +244,7 @@ class OpenSearchDB(BaseVectorDB):
         """
         query = {"query": {"match_all": {}}}
         response = self.client.count(index=self._get_index(), body=query)
-        doc_count = response["count"]
-        return doc_count
+        return response["count"]
 
     def reset(self):
         """

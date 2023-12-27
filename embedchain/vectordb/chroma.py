@@ -34,11 +34,7 @@ class ChromaDB(BaseVectorDB):
         :param config: Configuration options for Chroma, defaults to None
         :type config: Optional[ChromaDbConfig], optional
         """
-        if config:
-            self.config = config
-        else:
-            self.config = ChromaDbConfig()
-
+        self.config = config if config else ChromaDbConfig()
         self.settings = Settings(anonymized_telemetry=False)
         self.settings.allow_reset = self.config.allow_reset if hasattr(self.config, "allow_reset") else False
         if self.config.chroma_settings:
@@ -80,10 +76,7 @@ class ChromaDB(BaseVectorDB):
         # (no need to wrap in $and based on chroma docs)
         if len(where.keys()) <= 1:
             return where
-        where_filters = []
-        for k, v in where.items():
-            if isinstance(v, str):
-                where_filters.append({k: v})
+        where_filters = [{k: v} for k, v in where.items() if isinstance(v, str)]
         return {"$and": where_filters}
 
     def _get_or_create_collection(self, name: str) -> Collection:
@@ -155,8 +148,7 @@ class ChromaDB(BaseVectorDB):
 
         if len(documents) != size or len(metadatas) != size or len(ids) != size:
             raise ValueError(
-                "Cannot add documents to chromadb with inconsistent sizes. Documents size: {}, Metadata size: {},"
-                " Ids size: {}".format(len(documents), len(metadatas), len(ids))
+                f"Cannot add documents to chromadb with inconsistent sizes. Documents size: {len(documents)}, Metadata size: {len(metadatas)}, Ids size: {len(ids)}"
             )
 
         for i in tqdm(range(0, len(documents), self.BATCH_SIZE), desc="Inserting batches in chromadb"):

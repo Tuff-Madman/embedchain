@@ -37,8 +37,7 @@ def embedchain_bot(db_path, api_key):
 
 
 def get_db_path():
-    tmpdirname = tempfile.mkdtemp()
-    return tmpdirname
+    return tempfile.mkdtemp()
 
 
 def get_ec_app(api_key):

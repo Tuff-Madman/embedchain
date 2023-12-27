@@ -17,11 +17,7 @@ def chat():
 
 
 def handle_message(message):
-    if message.startswith("add "):
-        response = add_sources(message)
-    else:
-        response = query(message)
-    return response
+    return add_sources(message) if message.startswith("add ") else query(message)
 
 
 def add_sources(message):

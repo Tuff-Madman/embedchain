@@ -14,16 +14,13 @@ from embedchain.helpers.callbacks import (StreamingStdOutCallbackHandlerYield,
 
 @st.cache_resource
 def sadhguru_ai():
-    app = App()
-    return app
+    return App()
 
 
 # Function to read the CSV file row by row
 def read_csv_row_by_row(file_path):
     with open(file_path, mode="r", newline="", encoding="utf-8") as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            yield row
+        yield from csv.DictReader(file)
 
 
 @st.cache_resource

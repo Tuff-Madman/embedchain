@@ -47,7 +47,7 @@ class SitemapLoader(BaseLoader):
             raise ValueError("Invalid sitemap source. Please provide a valid URL or local file path.")
 
         links = [link.text for link in soup.find_all("loc") if link.parent.name == "url"]
-        if len(links) == 0:
+        if not links:
             links = [link.text for link in soup.find_all("loc")]
 
         doc_id = hashlib.sha256((" ".join(links) + sitemap_source).encode()).hexdigest()

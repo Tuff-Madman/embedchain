@@ -235,16 +235,14 @@ class Pipeline(EmbedChain):
                 skip_embedding=False,
                 citations=True,
             )
-            result = []
-            for c in context:
-                result.append(
-                    {
-                        "context": c[0],
-                        "source": c[1],
-                        "document_id": c[2],
-                    }
-                )
-            return result
+            return [
+                {
+                    "context": c[0],
+                    "source": c[1],
+                    "document_id": c[2],
+                }
+                for c in context
+            ]
         else:
             # Make API call to the backend to get the results
             NotImplementedError("Search is not implemented yet for the prod mode.")
@@ -315,11 +313,10 @@ class Pipeline(EmbedChain):
     def get_data_sources(self):
         db_data = self.cursor.execute("SELECT * FROM data_sources WHERE pipeline_id = ?", (self.local_id,)).fetchall()
 
-        data_sources = []
-        for data in db_data:
-            data_sources.append({"data_type": data[2], "data_value": data[3], "metadata": data[4]})
-
-        return data_sources
+        return [
+            {"data_type": data[2], "data_value": data[3], "metadata": data[4]}
+            for data in db_data
+        ]
 
     def deploy(self):
         if self.client is None:

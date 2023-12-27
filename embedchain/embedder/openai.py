@@ -21,11 +21,11 @@ class OpenAIEmbedder(BaseEmbedder):
         if self.config.deployment_name:
             embeddings = AzureOpenAIEmbeddings(deployment=self.config.deployment_name)
             embedding_fn = BaseEmbedder._langchain_default_concept(embeddings)
+        elif api_key is None and os.getenv("OPENAI_ORGANIZATION") is None:
+            raise ValueError(
+                "OPENAI_API_KEY or OPENAI_ORGANIZATION environment variables not provided"
+            )  # noqa:E501
         else:
-            if api_key is None and os.getenv("OPENAI_ORGANIZATION") is None:
-                raise ValueError(
-                    "OPENAI_API_KEY or OPENAI_ORGANIZATION environment variables not provided"
-                )  # noqa:E501
             embedding_fn = OpenAIEmbeddingFunction(
                 api_key=api_key,
                 organization_id=os.getenv("OPENAI_ORGANIZATION"),

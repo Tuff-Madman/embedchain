@@ -26,7 +26,7 @@ class BeehiivLoader(BaseLoader):
             ) from None
 
         if not url.endswith("sitemap.xml"):
-            url = url + "/sitemap.xml"
+            url += "/sitemap.xml"
 
         output = []
         # we need to set this as a header to avoid 403
@@ -57,7 +57,7 @@ class BeehiivLoader(BaseLoader):
             )
         soup = BeautifulSoup(response.text, "xml")
         links = [link.text for link in soup.find_all("loc") if link.parent.name == "url" and "/p/" in link.text]
-        if len(links) == 0:
+        if not links:
             links = [link.text for link in soup.find_all("loc") if "/p/" in link.text]
 
         doc_id = hashlib.sha256((" ".join(links) + url).encode()).hexdigest()

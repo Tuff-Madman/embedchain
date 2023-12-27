@@ -149,7 +149,7 @@ def create(template, extra_args):
         setup_streamlit_io_app()
     elif template == "gradio.app":
         setup_gradio_app()
-    elif template == "hf/gradio.app" or template == "hf/streamlit.app":
+    elif template in ["hf/gradio.app", "hf/streamlit.app"]:
         setup_hf_app()
     else:
         raise ValueError(f"Unknown template '{template}'.")
@@ -246,9 +246,9 @@ def dev(debug, host, port):
         run_dev_modal_com()
     elif template == "render.com":
         run_dev_render_com(debug, host, port)
-    elif template == "streamlit.io" or template == "hf/streamlit.app":
+    elif template in ["streamlit.io", "hf/streamlit.app"]:
         run_dev_streamlit_io()
-    elif template == "gradio.app" or template == "hf/gradio.app":
+    elif template in ["gradio.app", "hf/gradio.app"]:
         run_dev_gradio()
     else:
         raise ValueError(f"Unknown template '{template}'.")
@@ -269,9 +269,7 @@ def read_env_file(env_file_path):
         for line in file:
             # Ignore comments and empty lines
             if line.strip() and not line.strip().startswith("#"):
-                # Assume each line is in the format KEY=VALUE
-                key_value_match = re.match(r"(\w+)=(.*)", line.strip())
-                if key_value_match:
+                if key_value_match := re.match(r"(\w+)=(.*)", line.strip()):
                     key, value = key_value_match.groups()
                     env_vars[key] = value
     return env_vars

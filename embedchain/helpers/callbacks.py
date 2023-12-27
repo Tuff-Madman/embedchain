@@ -44,7 +44,7 @@ class StreamingStdOutCallbackHandlerYield(StreamingStdOutCallbackHandler):
 
     def on_llm_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> None:
         """Run when LLM errors."""
-        self.q.put("%s: %s" % (type(error).__name__, str(error)))
+        self.q.put(f"{type(error).__name__}: {str(error)}")
         self.q.put(STOP_ITEM)
 
 

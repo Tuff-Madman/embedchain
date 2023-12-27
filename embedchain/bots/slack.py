@@ -61,8 +61,7 @@ class SlackBot(BaseBot):
                         logging.error("Error occurred during 'add' command:", e)
 
     def send_slack_message(self, channel, message):
-        response = self.client.chat_postMessage(channel=channel, text=message)
-        return response
+        return self.client.chat_postMessage(channel=channel, text=message)
 
     def start(self, host="0.0.0.0", port=5000, debug=True):
         app = Flask(__name__)

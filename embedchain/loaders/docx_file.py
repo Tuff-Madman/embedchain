@@ -15,12 +15,11 @@ class DocxFileLoader(BaseLoader):
     def load_data(self, url):
         """Load data from a .docx file."""
         loader = Docx2txtLoader(url)
-        output = []
         data = loader.load()
         content = data[0].page_content
         meta_data = data[0].metadata
         meta_data["url"] = "local"
-        output.append({"content": content, "meta_data": meta_data})
+        output = [{"content": content, "meta_data": meta_data}]
         doc_id = hashlib.sha256((content + url).encode()).hexdigest()
         return {
             "doc_id": doc_id,

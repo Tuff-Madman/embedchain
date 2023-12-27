@@ -28,9 +28,7 @@ class PostgresLoader(BaseLoader):
         if "url" in config:
             config_info = config.get("url")
         else:
-            conn_params = []
-            for key, value in config.items():
-                conn_params.append(f"{key}={value}")
+            conn_params = [f"{key}={value}" for key, value in config.items()]
             config_info = " ".join(conn_params)
 
         logging.info(f"Connecting to postrgres sql: {config_info}")

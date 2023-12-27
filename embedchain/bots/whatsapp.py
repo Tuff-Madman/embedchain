@@ -23,11 +23,11 @@ class WhatsAppBot(BaseBot):
         super().__init__()
 
     def handle_message(self, message):
-        if message.startswith("add "):
-            response = self.add_data(message)
-        else:
-            response = self.ask_bot(message)
-        return response
+        return (
+            self.add_data(message)
+            if message.startswith("add ")
+            else self.ask_bot(message)
+        )
 
     def add_data(self, message):
         data = message.split(" ")[-1]

@@ -39,13 +39,13 @@ class ElasticsearchDB(BaseVectorDB):
         """
         if config is None and es_config is None:
             self.config = ElasticsearchDBConfig()
-        else:
-            if not isinstance(config, ElasticsearchDBConfig):
-                raise TypeError(
-                    "config is not a `ElasticsearchDBConfig` instance. "
-                    "Please make sure the type is right and that you are passing an instance."
-                )
+        elif isinstance(config, ElasticsearchDBConfig):
             self.config = config or es_config
+        else:
+            raise TypeError(
+                "config is not a `ElasticsearchDBConfig` instance. "
+                "Please make sure the type is right and that you are passing an instance."
+            )
         if self.config.ES_URL:
             self.client = Elasticsearch(self.config.ES_URL, **self.config.ES_EXTRA_PARAMS)
         elif self.config.CLOUD_ID:
@@ -144,15 +144,20 @@ class ElasticsearchDB(BaseVectorDB):
                 metadatas.append(metadata)
                 embeddings.append(embedding)
 
-            batch_docs = []
-            for id, text, metadata, embedding in zip(ids, docs, metadatas, embeddings):
-                batch_docs.append(
-                    {
-                        "_index": self._get_index(),
-                        "_id": id,
-                        "_source": {"text": text, "metadata": metadata, "embeddings": embedding},
-                    }
+            batch_docs = [
+                {
+                    "_index": self._get_index(),
+                    "_id": id,
+                    "_source": {
+                        "text": text,
+                        "metadata": metadata,
+                        "embeddings": embedding,
+                    },
+                }
+                for id, text, metadata, embedding in zip(
+                    ids, docs, metadatas, embeddings
                 )
+            ]
             bulk(self.client, batch_docs, **kwargs)
         self.client.indices.refresh(index=self._get_index())
 
@@ -212,7 +217,7 @@ class ElasticsearchDB(BaseVectorDB):
                 metadata = doc["_source"]["metadata"]
                 source = metadata["url"]
                 doc_id = metadata["doc_id"]
-                contexts.append(tuple((context, source, doc_id)))
+                contexts.append((context, source, doc_id))
             else:
                 contexts.append(context)
         return contexts
@@ -237,8 +242,7 @@ class ElasticsearchDB(BaseVectorDB):
         """
         query = {"match_all": {}}
         response = self.client.count(index=self._get_index(), query=query)
-        doc_count = response["count"]
-        return doc_count
+        return response["count"]
 
     def reset(self):
         """

@@ -16,11 +16,7 @@ class SlackLoader(BaseLoader):
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         super().__init__()
 
-        if config is not None:
-            self.config = config
-        else:
-            self.config = {"base_url": SLACK_API_BASE_URL}
-
+        self.config = {"base_url": SLACK_API_BASE_URL} if config is None else config
         self.client = None
         self._setup_loader(self.config)
 
