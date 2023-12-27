@@ -10,8 +10,7 @@ from embedchain.config import AppConfig, BaseLlmConfig
 @pytest.fixture
 def app():
     os.environ["OPENAI_API_KEY"] = "test_api_key"
-    app = App(config=AppConfig(collect_metrics=False))
-    return app
+    return App(config=AppConfig(collect_metrics=False))
 
 
 @patch("chromadb.api.models.Collection.Collection.add", MagicMock)

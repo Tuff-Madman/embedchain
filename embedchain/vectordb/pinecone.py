@@ -34,13 +34,13 @@ class PineconeDB(BaseVectorDB):
         """
         if config is None:
             self.config = PineconeDBConfig()
-        else:
-            if not isinstance(config, PineconeDBConfig):
-                raise TypeError(
-                    "config is not a `PineconeDBConfig` instance. "
-                    "Please make sure the type is right and that you are passing an instance."
-                )
+        elif isinstance(config, PineconeDBConfig):
             self.config = config
+        else:
+            raise TypeError(
+                "config is not a `PineconeDBConfig` instance. "
+                "Please make sure the type is right and that you are passing an instance."
+            )
         self.client = self._setup_pinecone_index()
         # Call parent init here because embedder is needed
         super().__init__(config=self.config)
@@ -78,7 +78,7 @@ class PineconeDB(BaseVectorDB):
         :return: ids
         :rtype: Set[str]
         """
-        existing_ids = list()
+        existing_ids = []
         if ids is not None:
             for i in range(0, len(ids), 1000):
                 result = self.client.fetch(ids=ids[i : i + 1000])
@@ -104,18 +104,18 @@ class PineconeDB(BaseVectorDB):
         :param ids: ids of docs
         :type ids: List[str]
         """
-        docs = []
         print("Adding documents to Pinecone...")
         embeddings = self.embedder.embedding_fn(documents)
-        for id, text, metadata, embedding in zip(ids, documents, metadatas, embeddings):
-            docs.append(
-                {
-                    "id": id,
-                    "values": embedding,
-                    "metadata": {**metadata, "text": text},
-                }
+        docs = [
+            {
+                "id": id,
+                "values": embedding,
+                "metadata": {**metadata, "text": text},
+            }
+            for id, text, metadata, embedding in zip(
+                ids, documents, metadatas, embeddings
             )
-
+        ]
         for chunk in chunks(docs, self.BATCH_SIZE, desc="Adding chunks in batches..."):
             self.client.upsert(chunk, **kwargs)
 
@@ -156,7 +156,7 @@ class PineconeDB(BaseVectorDB):
             if citations:
                 source = metadata["url"]
                 doc_id = metadata["doc_id"]
-                contexts.append(tuple((context, source, doc_id)))
+                contexts.append((context, source, doc_id))
             else:
                 contexts.append(context)
         return contexts

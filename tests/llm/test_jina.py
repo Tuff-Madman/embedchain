@@ -10,8 +10,13 @@ from embedchain.llm.jina import JinaLlm
 @pytest.fixture
 def config():
     os.environ["JINACHAT_API_KEY"] = "test_api_key"
-    config = BaseLlmConfig(temperature=0.7, max_tokens=50, top_p=0.8, stream=False, system_prompt="System prompt")
-    yield config
+    yield BaseLlmConfig(
+        temperature=0.7,
+        max_tokens=50,
+        top_p=0.8,
+        stream=False,
+        system_prompt="System prompt",
+    )
     os.environ.pop("JINACHAT_API_KEY")
 
 

@@ -16,8 +16,7 @@ def mysql_loader(mocker):
             "password": "your_password",
             "database": "your_database",
         }
-        loader = MySQLLoader(config=config)
-        yield loader
+        yield MySQLLoader(config=config)
 
 
 def test_mysql_loader_initialization(mysql_loader):

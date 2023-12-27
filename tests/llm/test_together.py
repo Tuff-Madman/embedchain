@@ -9,8 +9,12 @@ from embedchain.llm.together import TogetherLlm
 @pytest.fixture
 def together_llm_config():
     os.environ["TOGETHER_API_KEY"] = "test_api_key"
-    config = BaseLlmConfig(model="togethercomputer/RedPajama-INCITE-7B-Base", max_tokens=50, temperature=0.7, top_p=0.8)
-    yield config
+    yield BaseLlmConfig(
+        model="togethercomputer/RedPajama-INCITE-7B-Base",
+        max_tokens=50,
+        temperature=0.7,
+        top_p=0.8,
+    )
     os.environ.pop("TOGETHER_API_KEY")
 
 

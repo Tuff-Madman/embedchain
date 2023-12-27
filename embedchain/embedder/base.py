@@ -34,10 +34,7 @@ class BaseEmbedder:
         :param config: embedder configuration option class, defaults to None
         :type config: Optional[BaseEmbedderConfig], optional
         """
-        if config is None:
-            self.config = BaseEmbedderConfig()
-        else:
-            self.config = config
+        self.config = BaseEmbedderConfig() if config is None else config
         self.vector_dimension: int
 
     def set_embedding_fn(self, embedding_fn: Callable[[list[str]], list[str]]):

@@ -59,8 +59,8 @@ def parse_content(content, type):
     content = soup.get_text()
     content = clean_string(content)
 
-    cleaned_size = len(content)
     if original_size != 0:
+        cleaned_size = len(content)
         logging.info(
             f"Cleaned page size: {cleaned_size} characters, down from {original_size} (shrunk: {original_size-cleaned_size} chars, {round((1-(cleaned_size/original_size)) * 100, 2)}%)"  # noqa:E501
         )
@@ -163,7 +163,7 @@ def format_source(source: str, limit: int = 20) -> str:
     If the string is too short, it is not sliced.
     """
     if len(source) > 2 * limit:
-        return source[:limit] + "..." + source[-limit:]
+        return f"{source[:limit]}...{source[-limit:]}"
     return source
 
 
@@ -447,8 +447,6 @@ def chunks(iterable, batch_size=100, desc="Processing chunks"):
     total_size = len(iterable)
 
     with tqdm(total=total_size, desc=desc, unit="batch") as pbar:
-        chunk = tuple(itertools.islice(it, batch_size))
-        while chunk:
+        while chunk := tuple(itertools.islice(it, batch_size)):
             yield chunk
             pbar.update(len(chunk))
-            chunk = tuple(itertools.islice(it, batch_size))

@@ -51,7 +51,7 @@ class GPT4ALLLlm(BaseLlm):
         callbacks = [StreamingStdOutCallbackHandler()] if config.stream else [StdOutCallbackHandler()]
 
         response = self.instance.generate(prompts=messages, callbacks=callbacks, **kwargs)
-        answer = ""
-        for generations in response.generations:
-            answer += " ".join(map(lambda generation: generation.text, generations))
-        return answer
+        return "".join(
+            " ".join(map(lambda generation: generation.text, generations))
+            for generations in response.generations
+        )

@@ -10,15 +10,17 @@ from embedchain.helpers.callbacks import (StreamingStdOutCallbackHandlerYield,
 
 @st.cache_resource
 def unacademy_ai():
-    app = App()
-    return app
+    return App()
 
 
 app = unacademy_ai()
 
 assistant_avatar_url = "https://cdn-images-1.medium.com/v2/resize:fit:1200/1*LdFNhpOe7uIn-bHK9VUinA.jpeg"
 
-st.markdown(f"# <img src='{assistant_avatar_url}' width={35} /> Unacademy UPSC AI", unsafe_allow_html=True)
+st.markdown(
+    f"# <img src='{assistant_avatar_url}' width=35 /> Unacademy UPSC AI",
+    unsafe_allow_html=True,
+)
 
 styled_caption = """
 <p style="font-size: 17px; color: #aaa;">

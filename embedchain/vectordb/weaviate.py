@@ -33,13 +33,13 @@ class WeaviateDB(BaseVectorDB):
         """
         if config is None:
             self.config = WeaviateDBConfig()
-        else:
-            if not isinstance(config, WeaviateDBConfig):
-                raise TypeError(
-                    "config is not a `WeaviateDBConfig` instance. "
-                    "Please make sure the type is right and that you are passing an instance."
-                )
+        elif isinstance(config, WeaviateDBConfig):
             self.config = config
+        else:
+            raise TypeError(
+                "config is not a `WeaviateDBConfig` instance. "
+                "Please make sure the type is right and that you are passing an instance."
+            )
         self.client = weaviate.Client(
             url=os.environ.get("WEAVIATE_ENDPOINT"),
             auth_client_secret=weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY")),
@@ -82,12 +82,12 @@ class WeaviateDB(BaseVectorDB):
                             },
                             {
                                 "name": "metadata",
-                                "dataType": [self.index_name + "_metadata"],
+                                "dataType": [f"{self.index_name}_metadata"],
                             },
                         ],
                     },
                     {
-                        "class": self.index_name + "_metadata",
+                        "class": f"{self.index_name}_metadata",
                         "vectorizer": "none",
                         "properties": [
                             {
@@ -190,11 +190,16 @@ class WeaviateDB(BaseVectorDB):
                 )
                 metadata_uuid = batch.add_data_object(
                     data_object=copy.deepcopy(updated_metadata),
-                    class_name=self.index_name + "_metadata",
+                    class_name=f"{self.index_name}_metadata",
                     vector=embedding,
                 )
                 batch.add_reference(
-                    obj_uuid, self.index_name, "metadata", metadata_uuid, self.index_name + "_metadata", **kwargs
+                    obj_uuid,
+                    self.index_name,
+                    "metadata",
+                    metadata_uuid,
+                    f"{self.index_name}_metadata",
+                    **kwargs,
                 )
 
     def query(
@@ -232,24 +237,37 @@ class WeaviateDB(BaseVectorDB):
         data_fields = ["text"]
 
         if citations:
-            data_fields.append(weaviate.LinkTo("metadata", self.index_name + "_metadata", list(self.metadata_keys)))
+            data_fields.append(
+                weaviate.LinkTo(
+                    "metadata",
+                    f"{self.index_name}_metadata",
+                    list(self.metadata_keys),
+                )
+            )
 
-        if len(keys.intersection(self.metadata_keys)) != 0:
-            weaviate_where_operands = []
-            for key in keys:
-                if key in self.metadata_keys:
-                    weaviate_where_operands.append(
-                        {
-                            "path": ["metadata", self.index_name + "_metadata", key],
-                            "operator": "Equal",
-                            "valueText": where.get(key),
-                        }
-                    )
-            if len(weaviate_where_operands) == 1:
-                weaviate_where_clause = weaviate_where_operands[0]
-            else:
-                weaviate_where_clause = {"operator": "And", "operands": weaviate_where_operands}
+        if not keys.intersection(self.metadata_keys):
+            results = (
+                self.client.query.get(self.index_name, data_fields)
+                .with_near_vector({"vector": query_vector})
+                .with_limit(n_results)
+                .do()
+            )
 
+        else:
+            weaviate_where_operands = [
+                {
+                    "path": ["metadata", f"{self.index_name}_metadata", key],
+                    "operator": "Equal",
+                    "valueText": where.get(key),
+                }
+                for key in keys
+                if key in self.metadata_keys
+            ]
+            weaviate_where_clause = (
+                weaviate_where_operands[0]
+                if len(weaviate_where_operands) == 1
+                else {"operator": "And", "operands": weaviate_where_operands}
+            )
             results = (
                 self.client.query.get(self.index_name, data_fields)
                 .with_where(weaviate_where_clause)
@@ -257,14 +275,6 @@ class WeaviateDB(BaseVectorDB):
                 .with_limit(n_results)
                 .do()
             )
-        else:
-            results = (
-                self.client.query.get(self.index_name, data_fields)
-                .with_near_vector({"vector": query_vector})
-                .with_limit(n_results)
-                .do()
-            )
-
         docs = results["data"]["Get"].get(self.index_name)
         contexts = []
         for doc in docs:
@@ -321,5 +331,4 @@ class WeaviateDB(BaseVectorDB):
     def _query_with_cursor(self, query, cursor):
         if cursor is not None:
             query.with_after(cursor)
-        results = query.do()
-        return results
+        return query.do()

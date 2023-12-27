@@ -14,7 +14,7 @@ from embedchain.utils import clean_string
 GITHUB_URL = "https://github.com"
 GITHUB_API_URL = "https://api.github.com"
 
-VALID_SEARCH_TYPES = set(["code", "repo", "pr", "issue", "discussion"])
+VALID_SEARCH_TYPES = {"code", "repo", "pr", "issue", "discussion"}
 
 
 class GithubLoader(BaseLoader):
@@ -123,22 +123,22 @@ class GithubLoader(BaseLoader):
 
     def _github_search_repo(self, query: str):
         """Search github repo."""
-        data = []
         logging.info(f"Searching github repos with query: {query}")
         results = self.client.search_repositories(query)
         # Add repo urls and descriptions
         urls = list(map(lambda x: x.html_url, results))
         discriptions = list(map(lambda x: x.description, results))
-        data.append(
-            {
-                "content": clean_string(desc),
-                "meta_data": {
-                    "url": url,
-                },
-            }
-            for url, desc in zip(urls, discriptions)
-        )
-
+        data = [
+            (
+                {
+                    "content": clean_string(desc),
+                    "meta_data": {
+                        "url": url,
+                    },
+                }
+                for url, desc in zip(urls, discriptions)
+            )
+        ]
         # Add repo contents
         for result in results:
             clone_url = result.clone_url
@@ -225,15 +225,13 @@ class GithubLoader(BaseLoader):
         """Search github data."""
         if search_type == "code":
             data = self._github_search_code(query)
-        elif search_type == "repo":
-            data = self._github_search_repo(query)
-        elif search_type == "issue":
-            data = self._github_search_issues_and_pr(query, search_type)
-        elif search_type == "pr":
-            data = self._github_search_issues_and_pr(query, search_type)
         elif search_type == "discussion":
             raise ValueError("GithubLoader does not support searching discussions yet.")
 
+        elif search_type in {"issue", "pr"}:
+            data = self._github_search_issues_and_pr(query, search_type)
+        elif search_type == "repo":
+            data = self._github_search_repo(query)
         return data
 
     def _get_valid_github_query(self, query: str):
@@ -249,15 +247,14 @@ class GithubLoader(BaseLoader):
         types = set()
         type_pattern = r"type:([a-zA-Z,]+)"
         for term in query_terms:
-            term_match = re.search(type_pattern, term)
-            if term_match:
+            if term_match := re.search(type_pattern, term):
                 search_types = term_match.group(1).split(",")
                 types.update(search_types)
             else:
                 github_query.append(term)
 
         # query must provide search type
-        if len(types) == 0:
+        if not types:
             raise ValueError(
                 "GithubLoader requires a search query with `type:` term. Refer docs - `https://docs.embedchain.ai/data-sources/github`"  # noqa: E501
             )

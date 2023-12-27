@@ -34,12 +34,11 @@ class LlmFactory:
         # Default to embedchain base config if the provider is not in the config map
         config_name = "embedchain" if provider_name not in cls.provider_to_config_class else provider_name
         config_class_type = cls.provider_to_config_class.get(config_name)
-        if class_type:
-            llm_class = load_class(class_type)
-            llm_config_class = load_class(config_class_type)
-            return llm_class(config=llm_config_class(**config_data))
-        else:
+        if not class_type:
             raise ValueError(f"Unsupported Llm provider: {provider_name}")
+        llm_class = load_class(class_type)
+        llm_config_class = load_class(config_class_type)
+        return llm_class(config=llm_config_class(**config_data))
 
 
 class EmbedderFactory:
@@ -64,12 +63,11 @@ class EmbedderFactory:
         # Default to openai config if the provider is not in the config map
         config_name = "openai" if provider_name not in cls.provider_to_config_class else provider_name
         config_class_type = cls.provider_to_config_class.get(config_name)
-        if class_type:
-            embedder_class = load_class(class_type)
-            embedder_config_class = load_class(config_class_type)
-            return embedder_class(config=embedder_config_class(**config_data))
-        else:
+        if not class_type:
             raise ValueError(f"Unsupported Embedder provider: {provider_name}")
+        embedder_class = load_class(class_type)
+        embedder_config_class = load_class(config_class_type)
+        return embedder_class(config=embedder_config_class(**config_data))
 
 
 class VectorDBFactory:
@@ -96,9 +94,8 @@ class VectorDBFactory:
     def create(cls, provider_name, config_data):
         class_type = cls.provider_to_class.get(provider_name)
         config_class_type = cls.provider_to_config_class.get(provider_name)
-        if class_type:
-            embedder_class = load_class(class_type)
-            embedder_config_class = load_class(config_class_type)
-            return embedder_class(config=embedder_config_class(**config_data))
-        else:
+        if not class_type:
             raise ValueError(f"Unsupported Embedder provider: {provider_name}")
+        embedder_class = load_class(class_type)
+        embedder_config_class = load_class(config_class_type)
+        return embedder_class(config=embedder_config_class(**config_data))

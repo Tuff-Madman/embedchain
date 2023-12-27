@@ -17,7 +17,6 @@ class YoutubeVideoLoader(BaseLoader):
         """Load data from a Youtube video."""
         loader = YoutubeLoader.from_youtube_url(url, add_video_info=True)
         doc = loader.load()
-        output = []
         if not len(doc):
             raise ValueError(f"No data found for url: {url}")
         content = doc[0].page_content
@@ -25,12 +24,7 @@ class YoutubeVideoLoader(BaseLoader):
         meta_data = doc[0].metadata
         meta_data["url"] = url
 
-        output.append(
-            {
-                "content": content,
-                "meta_data": meta_data,
-            }
-        )
+        output = [{"content": content, "meta_data": meta_data}]
         doc_id = hashlib.sha256((content + url).encode()).hexdigest()
         return {
             "doc_id": doc_id,

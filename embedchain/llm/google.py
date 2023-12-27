@@ -30,8 +30,7 @@ class GoogleLlm(BaseLlm):
     def get_llm_model_answer(self, prompt):
         if self.config.system_prompt:
             raise ValueError("GoogleLlm does not support `system_prompt`")
-        response = self._get_answer(prompt)
-        return response
+        return self._get_answer(prompt)
 
     def _get_answer(self, prompt: str) -> Union[str, Generator[Any, Any, None]]:
         model_name = self.config.model or "gemini-pro"
@@ -59,6 +58,4 @@ class GoogleLlm(BaseLlm):
         if self.config.stream:
             # TODO: Implement streaming
             response.resolve()
-            return response.text
-        else:
-            return response.text
+        return response.text

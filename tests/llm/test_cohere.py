@@ -9,8 +9,9 @@ from embedchain.llm.cohere import CohereLlm
 @pytest.fixture
 def cohere_llm_config():
     os.environ["COHERE_API_KEY"] = "test_api_key"
-    config = BaseLlmConfig(model="gptd-instruct-tft", max_tokens=50, temperature=0.7, top_p=0.8)
-    yield config
+    yield BaseLlmConfig(
+        model="gptd-instruct-tft", max_tokens=50, temperature=0.7, top_p=0.8
+    )
     os.environ.pop("COHERE_API_KEY")
 
 

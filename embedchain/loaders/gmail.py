@@ -102,8 +102,8 @@ class GmailLoader(BaseLoader):
             content = soup.get_text()
             content = clean_string(content)
 
-            cleaned_size = len(content)
             if original_size != 0:
+                cleaned_size = len(content)
                 logging.info(
                     f"[{id}] Cleaned page size: {cleaned_size} characters, down from {original_size} (shrunk: {original_size-cleaned_size} chars, {round((1-(cleaned_size/original_size)) * 100, 2)}%)"  # noqa:E501
                 )
@@ -119,5 +119,4 @@ class GmailLoader(BaseLoader):
             data.append({"content": data_content, "meta_data": meta_data})
             data_contents.append(data_content)
         doc_id = hashlib.sha256((query + ", ".join(data_contents)).encode()).hexdigest()
-        response_data = {"doc_id": doc_id, "data": data}
-        return response_data
+        return {"doc_id": doc_id, "data": data}

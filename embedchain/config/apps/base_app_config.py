@@ -38,7 +38,7 @@ class BaseAppConfig(BaseConfig, JSONSerializable):
         """
         self._setup_logging(log_level)
         self.id = id
-        self.collect_metrics = True if (collect_metrics is True or collect_metrics is None) else False
+        self.collect_metrics = collect_metrics or collect_metrics is None
         self.collection_name = collection_name
 
         if db:

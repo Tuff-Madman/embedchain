@@ -100,6 +100,8 @@ class DiscordLoader(BaseLoader):
 
         messages = []
 
+
+
         class DiscordClient(discord.Client):
             async def on_ready(self) -> None:
                 logging.info("Logged on as {0}!".format(self.user))
@@ -109,11 +111,7 @@ class DiscordLoader(BaseLoader):
                         raise ValueError(
                             f"Channel {channel_id} is not a text channel. " "Only text channels are supported for now."
                         )
-                    threads = {}
-
-                    for thread in channel.threads:
-                        threads[thread.id] = thread
-
+                    threads = {thread.id: thread for thread in channel.threads}
                     async for message in channel.history(limit=None):
                         messages.append(DiscordLoader._format_message(message))
                         if message.id in threads:
@@ -125,6 +123,7 @@ class DiscordLoader(BaseLoader):
                     await self.close()
                 finally:
                     await self.close()
+
 
         intents = discord.Intents.default()
         intents.message_content = True

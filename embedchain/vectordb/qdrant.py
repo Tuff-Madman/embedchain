@@ -29,12 +29,11 @@ class QdrantDB(BaseVectorDB):
         """
         if config is None:
             config = QdrantDBConfig()
-        else:
-            if not isinstance(config, QdrantDBConfig):
-                raise TypeError(
-                    "config is not a `QdrantDBConfig` instance. "
-                    "Please make sure the type is right and that you are passing an instance."
-                )
+        elif not isinstance(config, QdrantDBConfig):
+            raise TypeError(
+                "config is not a `QdrantDBConfig` instance. "
+                "Please make sure the type is right and that you are passing an instance."
+            )
         self.config = config
         self.client = QdrantClient(url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"))
         # Call parent init here because embedder is needed
@@ -95,17 +94,16 @@ class QdrantDB(BaseVectorDB):
                 ),
             )
         ]
-        if len(keys.intersection(self.metadata_keys)) != 0:
-            for key in keys.intersection(self.metadata_keys):
-                qdrant_must_filters.append(
-                    models.FieldCondition(
-                        key="metadata.{}".format(key),
-                        match=models.MatchValue(
-                            value=where.get(key),
-                        ),
-                    )
+        if keys.intersection(self.metadata_keys):
+            qdrant_must_filters.extend(
+                models.FieldCondition(
+                    key=f"metadata.{key}",
+                    match=models.MatchValue(
+                        value=where.get(key),
+                    ),
                 )
-
+                for key in keys.intersection(self.metadata_keys)
+            )
         offset = 0
         existing_ids = []
         while offset is not None:
@@ -116,8 +114,7 @@ class QdrantDB(BaseVectorDB):
                 limit=self.BATCH_SIZE,
             )
             offset = response[1]
-            for doc in response[0]:
-                existing_ids.append(doc.payload["identifier"])
+            existing_ids.extend(doc.payload["identifier"] for doc in response[0])
         return {"ids": existing_ids}
 
     def add(
@@ -196,16 +193,16 @@ class QdrantDB(BaseVectorDB):
         keys = set(where.keys() if where is not None else set())
 
         qdrant_must_filters = []
-        if len(keys.intersection(self.metadata_keys)) != 0:
-            for key in keys.intersection(self.metadata_keys):
-                qdrant_must_filters.append(
-                    models.FieldCondition(
-                        key="payload.metadata.{}".format(key),
-                        match=models.MatchValue(
-                            value=where.get(key),
-                        ),
-                    )
+        if keys.intersection(self.metadata_keys):
+            qdrant_must_filters.extend(
+                models.FieldCondition(
+                    key=f"payload.metadata.{key}",
+                    match=models.MatchValue(
+                        value=where.get(key),
+                    ),
                 )
+                for key in keys.intersection(self.metadata_keys)
+            )
         results = self.client.search(
             collection_name=self.collection_name,
             query_filter=models.Filter(must=qdrant_must_filters),
@@ -221,7 +218,7 @@ class QdrantDB(BaseVectorDB):
                 metadata = result.payload["metadata"]
                 source = metadata["url"]
                 doc_id = metadata["doc_id"]
-                contexts.append(tuple((context, source, doc_id)))
+                contexts.append((context, source, doc_id))
             else:
                 contexts.append(context)
         return contexts

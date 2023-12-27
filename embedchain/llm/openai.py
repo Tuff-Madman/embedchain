@@ -17,8 +17,7 @@ class OpenAILlm(BaseLlm):
         super().__init__(config=config)
 
     def get_llm_model_answer(self, prompt) -> str:
-        response = self._get_answer(prompt, self.config)
-        return response
+        return self._get_answer(prompt, self.config)
 
     def _get_answer(self, prompt: str, config: BaseLlmConfig) -> str:
         messages = []

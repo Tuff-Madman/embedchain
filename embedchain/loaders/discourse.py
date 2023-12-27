@@ -46,11 +46,10 @@ class DiscourseLoader(BaseLoader):
             "topic_slug": response_data.get("topic_slug", ""),
             "score": response_data.get("score", ""),
         }
-        data = {
+        return {
             "content": post_contents,
             "meta_data": meta_data,
         }
-        return data
 
     def load_data(self, query):
         self._check_query(query)
@@ -66,8 +65,7 @@ class DiscourseLoader(BaseLoader):
         response_data = response.json()
         post_ids = response_data.get("grouped_search_result").get("post_ids")
         for id in post_ids:
-            post_data = self._load_post(id)
-            if post_data:
+            if post_data := self._load_post(id):
                 data.append(post_data)
                 data_contents.append(post_data.get("content"))
             # Sleep for 0.4 sec, to avoid rate limiting. Check `https://meta.discourse.org/t/api-rate-limits/208405/6`

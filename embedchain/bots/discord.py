@@ -63,10 +63,7 @@ async def query_command(interaction: discord.Interaction, question: str):
     logging.info(f"User: {member}, Query: {question}")
     try:
         answer = discord_bot.ask_bot(question)
-        if args.include_question:
-            response = f"> {question}\n\n{answer}"
-        else:
-            response = answer
+        response = f"> {question}\n\n{answer}" if args.include_question else answer
         await interaction.followup.send(response)
     except Exception as e:
         await interaction.followup.send("An error occurred. Please try again!")

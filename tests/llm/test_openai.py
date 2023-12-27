@@ -10,10 +10,14 @@ from embedchain.llm.openai import OpenAILlm
 @pytest.fixture
 def config():
     os.environ["OPENAI_API_KEY"] = "test_api_key"
-    config = BaseLlmConfig(
-        temperature=0.7, max_tokens=50, top_p=0.8, stream=False, system_prompt="System prompt", model="gpt-3.5-turbo"
+    yield BaseLlmConfig(
+        temperature=0.7,
+        max_tokens=50,
+        top_p=0.8,
+        stream=False,
+        system_prompt="System prompt",
+        model="gpt-3.5-turbo",
     )
-    yield config
     os.environ.pop("OPENAI_API_KEY")
 
 

@@ -54,11 +54,11 @@ class PoeBot(BaseBot, PoeBot):
         yield self.text_event(answer)
 
     def handle_message(self, message, history: Optional[List[str]] = None):
-        if message.startswith("/add "):
-            response = self.add_data(message)
-        else:
-            response = self.ask_bot(message, history)
-        return response
+        return (
+            self.add_data(message)
+            if message.startswith("/add ")
+            else self.ask_bot(message, history)
+        )
 
     # def add_data(self, message):
     #     data = message.split(" ")[-1]

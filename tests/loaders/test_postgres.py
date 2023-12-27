@@ -10,8 +10,7 @@ from embedchain.loaders.postgres import PostgresLoader
 def postgres_loader(mocker):
     with mocker.patch.object(psycopg, "connect"):
         config = {"url": "postgres://user:password@localhost:5432/database"}
-        loader = PostgresLoader(config=config)
-        yield loader
+        yield PostgresLoader(config=config)
 
 
 def test_postgres_loader_initialization(postgres_loader):

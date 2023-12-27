@@ -25,11 +25,7 @@ class ZillizVectorDB(BaseVectorDB):
         :type config: ZillizDBConfig
         """
 
-        if config is None:
-            self.config = ZillizDBConfig()
-        else:
-            self.config = config
-
+        self.config = ZillizDBConfig() if config is None else config
         self.client = MilvusClient(
             uri=self.config.uri,
             token=self.config.token,
@@ -189,7 +185,7 @@ class ZillizVectorDB(BaseVectorDB):
             if citations:
                 source = data["url"]
                 doc_id = data["doc_id"]
-                contexts.append(tuple((context, source, doc_id)))
+                contexts.append((context, source, doc_id))
             else:
                 contexts.append(context)
         return contexts

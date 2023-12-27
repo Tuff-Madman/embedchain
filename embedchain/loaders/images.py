@@ -27,7 +27,7 @@ class ImagesLoader(BaseLoader):
                     data.append(ClipProcessor.get_image_features(filepath, model))
                 except Exception as e:
                     # Log the file that was not loaded
-                    logging.exception("Failed to load the file {}. Exception {}".format(filepath, e))
+                    logging.exception(f"Failed to load the file {filepath}. Exception {e}")
         # Get the metadata like Size, Last Modified and Last Created timestamps
         image_path_metadata = [
             str(os.path.getsize(image_url)),

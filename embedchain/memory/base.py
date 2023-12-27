@@ -112,5 +112,4 @@ class ECChatMemory:
             QUERY,
             (app_id,),
         )
-        count = self.cursor.fetchone()[0]
-        return count
+        return self.cursor.fetchone()[0]

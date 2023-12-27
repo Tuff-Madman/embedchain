@@ -17,8 +17,7 @@ class JinaLlm(BaseLlm):
         super().__init__(config=config)
 
     def get_llm_model_answer(self, prompt):
-        response = JinaLlm._get_answer(prompt, self.config)
-        return response
+        return JinaLlm._get_answer(prompt, self.config)
 
     @staticmethod
     def _get_answer(prompt: str, config: BaseLlmConfig) -> str:

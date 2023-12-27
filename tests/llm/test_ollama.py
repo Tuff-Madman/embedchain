@@ -6,8 +6,13 @@ from embedchain.llm.ollama import OllamaLlm
 
 @pytest.fixture
 def ollama_llm_config():
-    config = BaseLlmConfig(model="llama2", temperature=0.7, top_p=0.8, stream=True, system_prompt=None)
-    yield config
+    yield BaseLlmConfig(
+        model="llama2",
+        temperature=0.7,
+        top_p=0.8,
+        stream=True,
+        system_prompt=None,
+    )
 
 
 def test_get_llm_model_answer(ollama_llm_config, mocker):

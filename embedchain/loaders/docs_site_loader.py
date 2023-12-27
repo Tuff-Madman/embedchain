@@ -46,8 +46,11 @@ class DocsSiteLoader(BaseLoader):
     def _get_all_urls(self, url):
         self.visited_links = set()
         self._get_child_links_recursive(url)
-        urls = [link for link in self.visited_links if urlparse(link).netloc == urlparse(url).netloc]
-        return urls
+        return [
+            link
+            for link in self.visited_links
+            if urlparse(link).netloc == urlparse(url).netloc
+        ]
 
     def _load_data_from_url(self, url):
         response = requests.get(url)
@@ -67,10 +70,8 @@ class DocsSiteLoader(BaseLoader):
             "main",
         ]
 
-        output = []
         for selector in selectors:
-            element = soup.select_one(selector)
-            if element:
+            if element := soup.select_one(selector):
                 content = element.prettify()
                 break
         else:
@@ -93,14 +94,7 @@ class DocsSiteLoader(BaseLoader):
             tag.decompose()
 
         content = " ".join(soup.stripped_strings)
-        output.append(
-            {
-                "content": content,
-                "meta_data": {"url": url},
-            }
-        )
-
-        return output
+        return [{"content": content, "meta_data": {"url": url}}]
 
     def load_data(self, url):
         all_urls = self._get_all_urls(url)
